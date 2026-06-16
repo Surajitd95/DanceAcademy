@@ -956,7 +956,18 @@ heroUpload.addEventListener('change', async (e) => {
   showToast('✓ Hero images saved');
 });
 
-function loadHero() { renderHero(); }
+async function loadHero() {
+  try {
+    const res = await fetch(`${API_BASE}/content`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.heroImages && data.heroImages.length > 0) {
+        heroData = data.heroImages.map(h => ({ url: h.url, id: h.id }));
+      }
+    }
+  } catch {}
+  renderHero();
+}
 function renderHero() {
   document.getElementById('heroGrid').innerHTML = heroData.map((h, i) => `
     <div class="media-thumb">
@@ -967,7 +978,16 @@ function renderHero() {
     </div>
   `).join('');
 }
-function deleteHero(i) { heroData.splice(i, 1); renderHero(); }
+async function deleteHero(i) {
+  if (!confirm('Delete this hero image?')) return;
+  const id = heroData[i].id;
+  try {
+    await fetch(`${API_BASE}/admin/hero/${id}`, { method: 'DELETE', headers: authHeaders() });
+  } catch {}
+  heroData.splice(i, 1);
+  renderHero();
+  showToast('Hero image deleted');
+}
 
 /* ── EVENTS ── */
 let eventsData = [];
