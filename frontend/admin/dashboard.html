@@ -701,7 +701,21 @@ let classesData = [
   { name:'Mohiniyattam',  description:'Kerala\'s lyrical and feminine classical dance...', tags:'Ages 8+,Intermediate+', image:'' },
 ];
 
-function loadClasses() {
+async function loadClasses() {
+  try {
+    const res = await fetch(`${API_BASE}/content`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.classes && data.classes.length > 0) {
+        classesData = data.classes.map(c => ({
+          name: c.name,
+          description: c.description,
+          image: c.image || '',
+          tags: Array.isArray(c.tags) ? c.tags.join(', ') : (c.tags || '')
+        }));
+      }
+    }
+  } catch {}
   renderClasses();
 }
 
