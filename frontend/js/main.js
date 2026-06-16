@@ -3,7 +3,8 @@
    Handles: nav, hero, gallery, lightbox, forms, API
    ═══════════════════════════════════════════════ */
 
-const API_BASE = 'http://localhost:8000/api';
+//const API_BASE = 'http://localhost:8000/api';
+const API_BASE = 'https://danceacademy-pfkt.onrender.com/api';
 
 /* ──────────────────────────────
    NAV — scroll + mobile toggle
