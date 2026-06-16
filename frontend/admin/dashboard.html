@@ -1089,10 +1089,10 @@ async function loadOverview() {
       if (data.recentEnquiries?.length) {
         document.getElementById('recentEnquiriesTbody').innerHTML = data.recentEnquiries.map(e => `
           <tr>
-            <td style="color:var(--ivory)">${e.firstName} ${e.lastName}</td>
-            <td>${e.email}</td>
-            <td>${e.danceForm||'—'}</td>
-            <td>${new Date(e.createdAt).toLocaleDateString()}</td>
+            <td style="color:var(--ivory)">${e.first_name||''} ${e.last_name||''}</td>
+            <td>${e.email||'—'}</td>
+            <td>${e.dance_form||'—'}</td>
+            <td>${e.created_at ? new Date(e.created_at).toLocaleDateString() : '—'}</td>
           </tr>
         `).join('');
       }
