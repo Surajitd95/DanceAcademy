@@ -1,0 +1,12 @@
+{
+  "liveServer.settings.donotVerifyTags": true,
+  "liveServer.settings.donotShowInfoMsg": true,
+  "liveServer.settings.ignoreFiles": [
+    "**/*.py",
+    "**/*.db",
+    "**/uploads/**",
+    "**/.git/**"
+  ],
+  "liveServer.settings.wait": 500,
+  "js/ts.implicitProjectConfig.checkJs": false
+}

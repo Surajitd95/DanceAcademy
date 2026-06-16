@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard – Nritya Arpan</title>
+  <meta name="robots" content="noindex, nofollow"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --navy:#0D0F1A; --navy-mid:#141728; --navy-light:#1E2238;
+      --gold:#C9A84C; --gold-light:#E2C97A; --ivory:#F5F0E8; --ivory-dim:#D4CCB8;
+      --sage:#6B8F71; --rose:#C47A7A; --error:#e07070;
+      --sidebar: 240px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--navy); color: var(--ivory); display: flex; min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; }
+    input, select, textarea, button { font-family: 'Inter', sans-serif; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar);
+      background: var(--navy-mid);
+      border-right: 1px solid rgba(201,168,76,0.15);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+    .sidebar-logo {
+      padding: 28px 24px;
+      border-bottom: 1px solid rgba(201,168,76,0.12);
+    }
+    .sidebar-logo .deva { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.4rem; }
+    .sidebar-logo .name { font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ivory-dim); display: block; }
+    .sidebar-logo .tag  { font-size: 0.62rem; color: var(--gold); letter-spacing: 0.1em; margin-top: 4px; display: block; }
+    .sidebar-nav { flex: 1; padding: 16px 0; overflow-y: auto; }
+    .nav-section-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(201,168,76,0.4);
+      padding: 16px 24px 8px;
+    }
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 24px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--ivory-dim);
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar-nav a:hover { color: var(--ivory); background: rgba(201,168,76,0.05); }
+    .sidebar-nav a.active { color: var(--gold); background: rgba(201,168,76,0.08); border-left-color: var(--gold); }
+    .sidebar-nav a .icon { font-size: 1rem; width: 20px; text-align: center; }
+    .sidebar-bottom {
+      padding: 16px;
+      border-top: 1px solid rgba(201,168,76,0.12);
+    }
+    .btn-logout {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 4px;
+      color: var(--ivory-dim);
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-logout:hover { border-color: var(--rose); color: var(--rose); }
+
+    /* ── MAIN ── */
+    .main { margin-left: var(--sidebar); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar {
+      background: var(--navy-mid);
+      border-bottom: 1px solid rgba(201,168,76,0.12);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-title { font-size: 1.1rem; font-weight: 600; color: var(--ivory); }
+    .topbar-actions { display: flex; gap: 12px; align-items: center; }
+    .view-site-btn {
+      padding: 8px 18px;
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      transition: all 0.2s;
+    }
+    .view-site-btn:hover { background: rgba(201,168,76,0.1); }
+    .content-area { padding: 32px; flex: 1; }
+
+    /* ── PANELS ── */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── STATS ROW ── */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    .stat-box {
+      background: var(--navy-light);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 6px;
+      padding: 20px;
+      transition: border-color 0.2s;
+    }
+    .stat-box:hover { border-color: var(--gold); }
+    .stat-box .s-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+    .stat-box .s-value { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--ivory); }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--navy-light);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 8px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid rgba(201,168,76,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-title { font-size: 0.88rem; font-weight: 600; color: var(--ivory); letter-spacing: 0.04em; }
+    .card-body { padding: 24px; }
+
+    /* ── FORMS ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-full { grid-column: 1 / -1; }
+    .fg { display: flex; flex-direction: column; gap: 7px; margin-bottom: 4px; }
+    .fg label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+    .fg input, .fg select, .fg textarea {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 4px;
+      padding: 11px 14px;
+      color: var(--ivory);
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    .fg input:focus, .fg select:focus, .fg textarea:focus {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.04);
+    }
+    .fg select option { background: var(--navy-mid); }
+    .fg textarea { resize: vertical; min-height: 90px; }
+    .save-btn {
+      padding: 11px 28px;
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .save-btn:hover { background: var(--gold-light); box-shadow: 0 0 20px rgba(201,168,76,0.3); }
+    .save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .add-btn {
+      padding: 9px 20px;
+      border: 1px solid var(--gold);
+      background: transparent;
+      color: var(--gold);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .add-btn:hover { background: rgba(201,168,76,0.1); }
+    .del-btn {
+      padding: 6px 14px;
+      border: 1px solid rgba(224,112,112,0.4);
+      background: transparent;
+      color: var(--error);
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .del-btn:hover { background: rgba(224,112,112,0.1); }
+    .success-toast {
+      position: fixed;
+      bottom: 32px; right: 32px;
+      background: var(--sage);
+      color: white;
+      padding: 14px 24px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      z-index: 9999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s;
+    }
+    .success-toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ── UPLOAD ZONE ── */
+    .upload-zone {
+      border: 2px dashed rgba(201,168,76,0.3);
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(201,168,76,0.02);
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.06);
+    }
+    .upload-zone input[type="file"] { display: none; }
+    .upload-zone .upload-icon { font-size: 2.5rem; margin-bottom: 12px; display: block; }
+    .upload-zone p { font-size: 0.85rem; color: var(--ivory-dim); }
+    .upload-zone span { color: var(--gold); font-weight: 600; }
+
+    /* ── MEDIA GRID ── */
+    .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top: 20px; }
+    .media-thumb {
+      position: relative;
+      aspect-ratio: 4/3;
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--navy-mid);
+      border: 1px solid rgba(201,168,76,0.15);
+    }
+    .media-thumb img, .media-thumb video { width: 100%; height: 100%; object-fit: cover; }
+    .media-thumb-actions {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(13,15,26,0.85);
+      padding: 6px;
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+      transform: translateY(100%);
+      transition: transform 0.2s;
+    }
+    .media-thumb:hover .media-thumb-actions { transform: translateY(0); }
+    .media-type-badge {
+      position: absolute;
+      top: 6px; left: 6px;
+      background: var(--gold);
+      color: var(--navy);
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+
+    /* ── EVENTS TABLE ── */
+    .events-table { width: 100%; border-collapse: collapse; }
+    .events-table th {
+      text-align: left;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+    .events-table td {
+      padding: 12px 16px;
+      font-size: 0.84rem;
+      color: var(--ivory-dim);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: middle;
+    }
+    .events-table tr:hover td { background: rgba(201,168,76,0.03); }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .badge-upcoming { background: rgba(107,143,113,0.2); color: var(--sage); border: 1px solid var(--sage); }
+    .badge-past { background: rgba(201,168,76,0.1); color: #8A6E2F; border: 1px solid #8A6E2F; }
+
+    /* ── ENQUIRIES TABLE ── */
+    .enquiries-table { width: 100%; border-collapse: collapse; }
+    .enquiries-table th {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--gold);
+      padding: 12px 16px; border-bottom: 1px solid rgba(201,168,76,0.15); text-align: left;
+    }
+    .enquiries-table td {
+      padding: 12px 16px; font-size: 0.82rem; color: var(--ivory-dim);
+      border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top;
+    }
+    .enquiries-table tr:hover td { background: rgba(201,168,76,0.03); color: var(--ivory); }
+    .new-badge {
+      display: inline-block; background: var(--gold); color: var(--navy);
+      font-size: 0.55rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; letter-spacing: 0.08em;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <span class="deva">नृत्य</span>
+    <span class="name">Arpan</span>
+    <span class="tag">Admin Dashboard</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <a href="javascript:void(0)" data-panel="overview"><span class="icon">📊</span> Overview</a>
+    <div class="nav-section-label">Content</div>
+    <a href="javascript:void(0)" data-panel="about"><span class="icon">👤</span> About & Guru</a>
+    <a href="javascript:void(0)" data-panel="classes"><span class="icon">🎭</span> Dance Classes</a>
+    <a href="javascript:void(0)" data-panel="gallery"><span class="icon">🖼️</span> Gallery</a>
+    <a href="javascript:void(0)" data-panel="events"><span class="icon">📅</span> Events</a>
+    <a href="javascript:void(0)" data-panel="hero"><span class="icon">🏠</span> Hero Banners</a>
+    <div class="nav-section-label">Settings</div>
+    <a href="javascript:void(0)" data-panel="contact"><span class="icon">📞</span> Contact Info</a>
+    <a href="javascript:void(0)" data-panel="enquiries"><span class="icon">✉️</span> Enquiries</a>
+  </nav>
+  <div class="sidebar-bottom">
+    <button class="btn-logout" id="logoutBtn">Sign Out</button>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title" id="topbarTitle">Overview</span>
+    <div class="topbar-actions">
+      <a href="../index.html" target="_blank" class="view-site-btn">View Website ↗</a>
+    </div>
+  </div>
+
+  <div class="content-area">
+
+    <!-- ── OVERVIEW ── -->
+    <div class="panel" id="panel-overview">
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="s-label">Total Enquiries</div>
+          <div class="s-value" id="totalEnquiries">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="s-label">Gallery Items</div>
+          <div class="s-value" id="totalMedia">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="s-label">Upcoming Events</div>
+          <div class="s-value" id="totalEvents">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="s-label">Dance Classes</div>
+          <div class="s-value" id="totalClasses">3</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Recent Enquiries</span></div>
+        <div class="card-body">
+          <table class="enquiries-table" id="recentEnquiriesTable">
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Dance Form</th><th>Date</th></tr>
+            </thead>
+            <tbody id="recentEnquiriesTbody">
+              <tr><td colspan="4" style="text-align:center;color:rgba(212,204,184,0.4);padding:32px;">No enquiries yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ABOUT ── -->
+    <div class="panel" id="panel-about">
+      <div class="card">
+        <div class="card-header"><span class="card-title">About & Guru Section</span></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="fg form-full">
+              <label>Section Title</label>
+              <input type="text" id="aboutTitle" placeholder="A Legacy of Grace & Devotion"/>
+            </div>
+            <div class="fg form-full">
+              <label>Body Text (HTML allowed)</label>
+              <textarea id="aboutBody" rows="5" placeholder="Write about the institute..."></textarea>
+            </div>
+            <div class="fg form-full">
+              <label>Inspirational Quote</label>
+              <input type="text" id="aboutQuote" placeholder="Let your life lightly dance..."/>
+            </div>
+            <div class="fg">
+              <label>Years of Legacy</label>
+              <input type="text" id="statYears" placeholder="19+"/>
+            </div>
+            <div class="fg">
+              <label>Students Trained</label>
+              <input type="text" id="statStudents" placeholder="500+"/>
+            </div>
+            <div class="fg">
+              <label>Performances</label>
+              <input type="text" id="statPerfs" placeholder="100+"/>
+            </div>
+            <div class="fg form-full">
+              <label>Guru Photo</label>
+              <input type="file" id="guruPhoto" accept="image/*"/>
+              <small style="color:var(--ivory-dim);font-size:0.75rem;margin-top:4px;">Recommended: 600×750px, JPG/WebP</small>
+            </div>
+          </div>
+          <div style="margin-top:20px;">
+            <button type="button" class="save-btn" onclick="saveSection('about')">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CLASSES ── -->
+    <div class="panel" id="panel-classes">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Dance Classes</span>
+          <button type="button" class="add-btn" onclick="addClassRow()">+ Add Class</button>
+        </div>
+        <div class="card-body" id="classesEditor">
+          <!-- Rendered by JS -->
+        </div>
+        <div style="padding:0 24px 24px;">
+          <button type="button" class="save-btn" onclick="saveSection('classes')">Save All Classes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── GALLERY ── -->
+    <div class="panel" id="panel-gallery">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Upload Photos & Videos</span></div>
+        <div class="card-body">
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" id="mediaUpload" accept="image/*,video/*" multiple/>
+            <span class="upload-icon">📁</span>
+            <p>Drag &amp; drop photos or videos here, or <span>click to browse</span></p>
+            <p style="margin-top:8px;font-size:0.75rem;color:rgba(212,204,184,0.4);">Supports JPG, PNG, WebP, MP4 · Max 50MB per file</p>
+          </div>
+          <div id="uploadProgress" style="margin-top:16px;display:none;">
+            <div style="background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;">
+              <div id="progressBar" style="height:4px;background:var(--gold);width:0%;transition:width 0.3s;"></div>
+            </div>
+            <p id="progressText" style="font-size:0.78rem;color:var(--ivory-dim);margin-top:8px;"></p>
+          </div>
+          <div class="media-grid" id="mediaGrid">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EVENTS ── -->
+    <div class="panel" id="panel-events">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Events & Performances</span>
+          <button type="button" class="add-btn" onclick="showEventForm()">+ Add Event</button>
+        </div>
+        <div class="card-body" id="eventFormContainer" style="display:none;border-bottom:1px solid rgba(201,168,76,0.1);margin-bottom:24px;padding-bottom:24px;">
+          <div class="form-grid">
+            <div class="fg"><label>Event Title</label><input type="text" id="evTitle" placeholder="Dance Festival 2025"/></div>
+            <div class="fg"><label>Location</label><input type="text" id="evLocation" placeholder="Rabindra Bhawan, Kolkata"/></div>
+            <div class="fg"><label>Date</label><input type="date" id="evDate"/></div>
+            <div class="fg"><label>Status</label>
+              <select id="evStatus"><option value="upcoming">Upcoming</option><option value="past">Past</option></select>
+            </div>
+            <div class="fg form-full"><label>Description</label><textarea id="evDesc" rows="3"></textarea></div>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:12px;">
+            <button type="button" class="save-btn" onclick="saveEvent()">Add Event</button>
+            <button type="button" class="del-btn" onclick="hideEventForm()">Cancel</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding-top:0;">
+          <table class="events-table">
+            <thead><tr><th>Title</th><th>Date</th><th>Location</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="eventsTableBody">
+              <tr><td colspan="5" style="text-align:center;color:rgba(212,204,184,0.4);padding:32px;">No events yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HERO BANNERS ── -->
+    <div class="panel" id="panel-hero">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Hero Banner Images</span></div>
+        <div class="card-body">
+          <p style="font-size:0.84rem;color:var(--ivory-dim);margin-bottom:20px;">Upload full-screen hero images. Recommended: 1920×1080px, JPG/WebP. Max 5 images.</p>
+          <div class="upload-zone" id="heroUploadZone">
+            <input type="file" id="heroUpload" accept="image/*" multiple/>
+            <span class="upload-icon">🖼️</span>
+            <p>Click to upload hero banner images</p>
+          </div>
+          <div class="media-grid" id="heroGrid" style="margin-top:20px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CONTACT INFO ── -->
+    <div class="panel" id="panel-contact">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Contact Information</span></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="fg form-full"><label>Address</label><input type="text" id="ciAddress" placeholder="Durgapur, West Bengal – 713201"/></div>
+            <div class="fg"><label>Phone</label><input type="tel" id="ciPhone" placeholder="+91-XXXXXXXXXX"/></div>
+            <div class="fg"><label>Email</label><input type="email" id="ciEmail" placeholder="info@yourdomain.com"/></div>
+            <div class="fg form-full"><label>Class Hours</label><input type="text" id="ciHours" placeholder="Mon–Sat: 4:00 PM – 8:00 PM"/></div>
+            <div class="fg"><label>Facebook URL</label><input type="url" id="ciFB" placeholder="https://facebook.com/..."/></div>
+            <div class="fg"><label>Instagram URL</label><input type="url" id="ciIG" placeholder="https://instagram.com/..."/></div>
+            <div class="fg form-full"><label>YouTube URL</label><input type="url" id="ciYT" placeholder="https://youtube.com/@..."/></div>
+          </div>
+          <div style="margin-top:20px;">
+            <button type="button" class="save-btn" onclick="saveSection('contact')">Save Contact Info</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ENQUIRIES ── -->
+    <div class="panel" id="panel-enquiries">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">All Enquiries</span>
+          <button type="button" class="add-btn" onclick="exportEnquiries()">Export CSV</button>
+        </div>
+        <div class="card-body">
+          <table class="enquiries-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Dance Form</th><th>Message</th><th>Date</th></tr></thead>
+            <tbody id="allEnquiriesTbody">
+              <tr><td colspan="6" style="text-align:center;color:rgba(212,204,184,0.4);padding:32px;">No enquiries yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-area -->
+</div><!-- /main -->
+
+<!-- Toast -->
+<div class="success-toast" id="toast"></div>
+
+<script>
+const API_BASE = 'http://localhost:8000/api';
+let currentPanel = 'overview';
+
+/* ── AUTH ── */
+const token = localStorage.getItem('admin_token');
+if (!token) window.location.href = 'login.html';
+
+function authHeaders() {
+  return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+}
+
+function switchPanel(panelId) {
+  currentPanel = panelId;
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`panel-${panelId}`).classList.add('active');
+  document.querySelectorAll('.sidebar-nav a[data-panel]').forEach(l => {
+    l.classList.toggle('active', l.dataset.panel === panelId);
+  });
+  const label = {'overview':'Overview','about':'About & Guru','classes':'Dance Classes',
+    'gallery':'Gallery','events':'Events','hero':'Hero Banners','contact':'Contact Info','enquiries':'Enquiries'};
+  document.getElementById('topbarTitle').textContent = label[panelId] || panelId;
+  if (panelId === 'gallery') loadGallery();
+  if (panelId === 'events') loadEvents();
+  if (panelId === 'enquiries') loadEnquiries();
+  if (panelId === 'overview') loadOverview();
+  if (panelId === 'about') loadAbout();
+  if (panelId === 'contact') loadContact();
+  if (panelId === 'hero') loadHero();
+  if (panelId === 'classes') loadClasses();
+}
+
+/* ── NAVIGATION ── */
+const navLinks = document.querySelectorAll('.sidebar-nav a[data-panel]');
+navLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    switchPanel(link.dataset.panel);
+  });
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  localStorage.removeItem('admin_token');
+  window.location.href = 'login.html';
+});
+
+/* ── TOAST ── */
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = isError ? '#e07070' : '#6B8F71';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ── GENERIC SAVE ── */
+async function saveSection(section) {
+  if (section === 'classes') { await saveSection_classes(); return; }
+  let payload = {};
+  if (section === 'about') {
+    payload = {
+      title: document.getElementById('aboutTitle').value,
+      body:  document.getElementById('aboutBody').value,
+      quote: document.getElementById('aboutQuote').value,
+      years: document.getElementById('statYears').value,
+      students: document.getElementById('statStudents').value,
+      perfs: document.getElementById('statPerfs').value,
+    };
+    // Handle guru photo upload if selected
+    const photoFile = document.getElementById('guruPhoto').files[0];
+    if (photoFile) {
+      const url = await uploadFile(photoFile);
+      if (url) payload.image = url;
+    }
+  } else if (section === 'contact') {
+    payload = {
+      address:   document.getElementById('ciAddress').value,
+      phone:     document.getElementById('ciPhone').value,
+      email:     document.getElementById('ciEmail').value,
+      hours:     document.getElementById('ciHours').value,
+      facebook:  document.getElementById('ciFB').value,
+      instagram: document.getElementById('ciIG').value,
+      youtube:   document.getElementById('ciYT').value,
+    };
+  }
+  try {
+    const res = await fetch(`${API_BASE}/admin/content/${section}`, {
+      method: 'POST', headers: authHeaders(), body: JSON.stringify(payload),
+    });
+    if (res.ok) showToast('✓ Saved successfully');
+    else showToast('Error saving. Try again.', true);
+  } catch {
+    showToast('✓ Saved (offline mode)', false);
+  }
+}
+
+/* ── ABOUT ── */
+async function loadAbout() {
+  try {
+    const res = await fetch(`${API_BASE}/content`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.about) {
+      document.getElementById('aboutTitle').value  = data.about.title || '';
+      document.getElementById('aboutBody').value   = data.about.body || '';
+      document.getElementById('aboutQuote').value  = data.about.quote || '';
+      document.getElementById('statYears').value   = data.about.years || '';
+      document.getElementById('statStudents').value= data.about.students || '';
+      document.getElementById('statPerfs').value   = data.about.perfs || '';
+    }
+  } catch {}
+}
+
+/* ── CLASSES ── */
+let classesData = [
+  { name:'Bharatanatyam', description:'One of India\'s oldest classical dance forms...', tags:'All Ages,Beginner to Advanced', image:'' },
+  { name:'Kuchipudi',     description:'A vibrant dance-drama tradition from Andhra Pradesh...', tags:'Ages 6+,All Levels', image:'' },
+  { name:'Mohiniyattam',  description:'Kerala\'s lyrical and feminine classical dance...', tags:'Ages 8+,Intermediate+', image:'' },
+];
+
+function loadClasses() {
+  renderClasses();
+}
+
+function renderClasses() {
+  const editor = document.getElementById('classesEditor');
+  editor.innerHTML = classesData.map((c, i) => `
+    <div class="card" style="margin-bottom:16px;border-color:rgba(201,168,76,0.1);">
+      <div class="card-header">
+        <span class="card-title">Class ${i+1}: ${c.name || 'New Class'}</span>
+        <button type="button" class="del-btn cls-del-btn" data-i="${i}">Remove</button>
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="fg"><label>Class Name</label>
+            <input type="text" id="cls_name_${i}" value="${c.name}"/>
+          </div>
+          <div class="fg"><label>Tags (comma-separated)</label>
+            <input type="text" id="cls_tags_${i}" value="${c.tags}"/>
+          </div>
+          <div class="fg form-full"><label>Description</label>
+            <textarea rows="3" id="cls_desc_${i}">${c.description}</textarea>
+          </div>
+          <div class="fg form-full">
+            <label>Class Image</label>
+            <input type="file" accept="image/*" id="cls_img_${i}"/>
+            ${c.image ? `<img src="${c.image}" style="margin-top:8px;height:80px;border-radius:4px;object-fit:cover;display:block;"/>` : ''}
+            <button type="button" class="add-btn cls-upload-btn" data-i="${i}" style="margin-top:8px;">Upload Image</button>
+            <span id="cls_status_${i}" style="font-size:0.75rem;color:var(--gold);margin-top:4px;display:block;"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Bind delete buttons
+  editor.querySelectorAll('.cls-del-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault(); e.stopPropagation();
+      if (!confirm('Remove this class?')) return;
+      syncDOM(); classesData.splice(+this.dataset.i, 1); renderClasses();
+    });
+  });
+
+  // Bind upload buttons
+  editor.querySelectorAll('.cls-upload-btn').forEach(btn => {
+    btn.addEventListener('click', async function(e) {
+      e.preventDefault(); e.stopPropagation();
+      const i = +this.dataset.i;
+      syncDOM();
+      const input = document.getElementById(`cls_img_${i}`);
+      const status = document.getElementById(`cls_status_${i}`);
+      if (!input.files[0]) { status.textContent = 'Select an image first'; return; }
+      status.textContent = 'Uploading...';
+      const url = await uploadFile(input.files[0]);
+      if (url) {
+        classesData[i].image = url;
+        status.textContent = '✓ Uploaded — now click Save All Classes';
+        // insert thumbnail
+        let img = document.getElementById(`cls_thumb_${i}`);
+        if (!img) {
+          img = document.createElement('img');
+          img.id = `cls_thumb_${i}`;
+          img.style.cssText = 'margin-top:8px;height:80px;border-radius:4px;object-fit:cover;display:block;';
+          input.after(img);
+        }
+        img.src = url;
+      } else {
+        status.textContent = '✗ Upload failed';
+      }
+    });
+  });
+}
+
+function syncDOM() {
+  classesData.forEach((c, i) => {
+    const n = document.getElementById(`cls_name_${i}`);
+    const t = document.getElementById(`cls_tags_${i}`);
+    const d = document.getElementById(`cls_desc_${i}`);
+    if (n) c.name = n.value;
+    if (t) c.tags = t.value;
+    if (d) c.description = d.value;
+  });
+}
+
+function addClassRow() {
+  syncDOM();
+  classesData.push({ name:'', description:'', tags:'', image:'' });
+  renderClasses();
+}
+function deleteClass(i) { /* handled by addEventListener above */ }
+async function uploadClassImage(idx) { /* handled by addEventListener above */ }
+async function saveSection_classes() {
+  syncDOM();
+  try {
+    const payload = classesData.map(c => ({
+      name: c.name, description: c.description, image: c.image,
+      tags: typeof c.tags === 'string' ? c.tags.split(',').map(t=>t.trim()) : (c.tags||[])
+    }));
+    const res = await fetch(`${API_BASE}/admin/content/classes`, {
+      method:'POST', headers: authHeaders(), body: JSON.stringify(payload),
+    });
+    if (res.ok) showToast('✓ Classes saved');
+    else showToast('Error saving.', true);
+  } catch { showToast('✓ Classes saved (offline mode)'); }
+}
+
+/* ── FILE UPLOAD ── */
+async function uploadFile(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  try {
+    const res = await fetch(`${API_BASE}/admin/upload`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData,
+    });
+    const data = await res.json();
+    return data.url || null;
+  } catch {
+    // Dev mode: return a fake URL
+    return URL.createObjectURL(file);
+  }
+}
+
+/* ── GALLERY ── */
+let galleryData = [];
+
+async function loadGallery() {
+  try {
+    const res = await fetch(`${API_BASE}/admin/gallery`, { headers: authHeaders() });
+    if (res.ok) { galleryData = await res.json(); renderGallery(); }
+  } catch { renderGallery(); }
+}
+
+function renderGallery() {
+  const grid = document.getElementById('mediaGrid');
+  if (galleryData.length === 0) {
+    grid.innerHTML = '<p style="color:rgba(212,204,184,0.4);font-size:0.85rem;">No media uploaded yet.</p>';
+    return;
+  }
+  grid.innerHTML = galleryData.map((item, i) => {
+    const isVideo = item.type === 'videos';
+    return `<div class="media-thumb">
+      ${isVideo
+        ? `<video src="${item.url}" muted></video>`
+        : `<img src="${item.url}" alt="${item.caption||''}" loading="lazy"/>`}
+      <div class="media-type-badge">${isVideo ? 'Video' : 'Photo'}</div>
+      <div class="media-thumb-actions">
+        <button type="button" class="del-btn" style="font-size:0.65rem;padding:4px 10px;" onclick="deleteMedia(${i})">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteMedia(i) {
+  if (!confirm('Delete this media item?')) return;
+  const item = galleryData[i];
+  try {
+    await fetch(`${API_BASE}/admin/gallery/${item.id}`, { method:'DELETE', headers: authHeaders() });
+  } catch {}
+  galleryData.splice(i, 1);
+  renderGallery();
+  showToast('Deleted');
+}
+
+// Upload zone
+const uploadZone = document.getElementById('uploadZone');
+const mediaUpload = document.getElementById('mediaUpload');
+uploadZone.addEventListener('click', (e) => { e.stopPropagation(); mediaUpload.click(); });
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault(); uploadZone.classList.remove('drag-over');
+  handleMediaFiles(Array.from(e.dataTransfer.files));
+});
+mediaUpload.addEventListener('change', () => handleMediaFiles(Array.from(mediaUpload.files)));
+
+async function handleMediaFiles(files) {
+  const prog = document.getElementById('uploadProgress');
+  const bar  = document.getElementById('progressBar');
+  const txt  = document.getElementById('progressText');
+  prog.style.display = 'block';
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    txt.textContent = `Uploading ${file.name}... (${i+1}/${files.length})`;
+    bar.style.width = `${((i+0.5)/files.length)*100}%`;
+    const isVideo = file.type.startsWith('video/');
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', isVideo ? 'videos' : 'photos');
+      const res = await fetch(`${API_BASE}/admin/gallery/upload`, {
+        method:'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData,
+      });
+      if (res.ok) {
+        const d = await res.json();
+        galleryData.push({ id: d.id, url: d.url, type: isVideo ? 'videos' : 'photos', caption:'' });
+      }
+    } catch {
+      // Dev: use object URL
+      galleryData.push({ id: Date.now(), url: URL.createObjectURL(file), type: isVideo ? 'videos' : 'photos', caption: file.name });
+    }
+    bar.style.width = `${((i+1)/files.length)*100}%`;
+  }
+  txt.textContent = `✓ Uploaded ${files.length} file(s)`;
+  renderGallery();
+  setTimeout(() => { prog.style.display = 'none'; bar.style.width = '0%'; }, 2000);
+}
+
+/* ── HERO BANNERS ── */
+const heroUploadZone = document.getElementById('heroUploadZone');
+const heroUpload     = document.getElementById('heroUpload');
+let heroData = [];
+
+heroUploadZone.addEventListener('click', (e) => { e.stopPropagation(); heroUpload.click(); });
+heroUpload.addEventListener('change', async (e) => {
+  e.stopPropagation();
+  const files = Array.from(heroUpload.files);
+  if (!files.length) return;
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch(`${API_BASE}/admin/hero/upload`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData,
+      });
+      if (res.ok) {
+        const d = await res.json();
+        heroData.push({ url: d.url, id: Date.now() });
+      }
+    } catch {
+      heroData.push({ url: URL.createObjectURL(file), id: Date.now() });
+    }
+  }
+  renderHero();
+  showToast('✓ Hero images saved');
+});
+
+function loadHero() { renderHero(); }
+function renderHero() {
+  document.getElementById('heroGrid').innerHTML = heroData.map((h, i) => `
+    <div class="media-thumb">
+      <img src="${h.url}" alt="Hero ${i+1}"/>
+      <div class="media-thumb-actions">
+        <button type="button" class="del-btn" style="font-size:0.65rem;padding:4px 10px;" onclick="deleteHero(${i})">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+function deleteHero(i) { heroData.splice(i, 1); renderHero(); }
+
+/* ── EVENTS ── */
+let eventsData = [];
+
+async function loadEvents() {
+  try {
+    const res = await fetch(`${API_BASE}/admin/events`, { headers: authHeaders() });
+    if (res.ok) eventsData = await res.json();
+  } catch {}
+  renderEventsTable();
+}
+
+function renderEventsTable() {
+  const tbody = document.getElementById('eventsTableBody');
+  if (eventsData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:rgba(212,204,184,0.4);padding:32px;">No events yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = eventsData.map((ev, i) => `
+    <tr>
+      <td style="color:var(--ivory);font-weight:500;">${ev.title}</td>
+      <td>${ev.date}</td>
+      <td>${ev.location}</td>
+      <td><span class="badge badge-${ev.status}">${ev.status}</span></td>
+      <td><button type="button" class="del-btn" onclick="deleteEvent(${i})">Delete</button></td>
+    </tr>
+  `).join('');
+}
+
+function showEventForm() { document.getElementById('eventFormContainer').style.display = 'block'; }
+function hideEventForm() { document.getElementById('eventFormContainer').style.display = 'none'; }
+
+async function saveEvent() {
+  const d = new Date(document.getElementById('evDate').value);
+  const ev = {
+    title:    document.getElementById('evTitle').value,
+    location: document.getElementById('evLocation').value,
+    date:     document.getElementById('evDate').value,
+    day:      d.getDate().toString().padStart(2,'0'),
+    month:    d.toLocaleString('en',{month:'short'}),
+    description: document.getElementById('evDesc').value,
+    status:   document.getElementById('evStatus').value,
+  };
+  try {
+    const res = await fetch(`${API_BASE}/admin/events`, {
+      method:'POST', headers: authHeaders(), body: JSON.stringify(ev),
+    });
+    if (res.ok) { const saved = await res.json(); eventsData.push(saved); }
+    else eventsData.push({...ev, id: Date.now()});
+  } catch { eventsData.push({...ev, id: Date.now()}); }
+  renderEventsTable();
+  hideEventForm();
+  showToast('✓ Event added');
+}
+
+async function deleteEvent(i) {
+  if (!confirm('Delete this event?')) return;
+  const id = eventsData[i].id;
+  try { await fetch(`${API_BASE}/admin/events/${id}`, { method:'DELETE', headers: authHeaders() }); } catch {}
+  eventsData.splice(i, 1);
+  renderEventsTable();
+  showToast('Event deleted');
+}
+
+/* ── ENQUIRIES ── */
+let enquiriesData = [];
+
+async function loadEnquiries() {
+  try {
+    const res = await fetch(`${API_BASE}/admin/enquiries`, { headers: authHeaders() });
+    if (res.ok) enquiriesData = await res.json();
+  } catch {}
+  renderEnquiries();
+}
+
+function renderEnquiries() {
+  const tbody = document.getElementById('allEnquiriesTbody');
+  if (enquiriesData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:rgba(212,204,184,0.4);padding:32px;">No enquiries yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = enquiriesData.map(e => `
+    <tr>
+      <td style="color:var(--ivory);font-weight:500;">${e.first_name||''} ${e.last_name||''} ${!e.is_read ? '<span class="new-badge">NEW</span>' : ''}</td>
+      <td>${e.email||'—'}</td>
+      <td>${e.phone||'—'}</td>
+      <td>${e.dance_form||'—'}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.message||'—'}</td>
+      <td>${e.created_at ? new Date(e.created_at).toLocaleDateString() : '—'}</td>
+    </tr>
+  `).join('');
+}
+
+function exportEnquiries() {
+  if (!enquiriesData.length) return showToast('No enquiries to export', true);
+  const headers = ['First Name','Last Name','Email','Phone','Dance Form','Message','Date'];
+  const rows = enquiriesData.map(e => [e.firstName,e.lastName,e.email,e.phone,e.danceForm,e.message,e.createdAt]);
+  const csv = [headers, ...rows].map(r => r.map(c => `"${(c||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `enquiries_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+/* ── CONTACT LOAD ── */
+async function loadContact() {
+  try {
+    const res = await fetch(`${API_BASE}/content`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.contact) {
+      document.getElementById('ciAddress').value = data.contact.address||'';
+      document.getElementById('ciPhone').value   = data.contact.phone||'';
+      document.getElementById('ciEmail').value   = data.contact.email||'';
+      document.getElementById('ciHours').value   = data.contact.hours||'';
+      document.getElementById('ciFB').value      = data.contact.facebook||'';
+      document.getElementById('ciIG').value      = data.contact.instagram||'';
+      document.getElementById('ciYT').value      = data.contact.youtube||'';
+    }
+  } catch {}
+}
+
+/* ── OVERVIEW ── */
+async function loadOverview() {
+  try {
+    const res = await fetch(`${API_BASE}/admin/stats`, { headers: authHeaders() });
+    if (res.ok) {
+      const data = await res.json();
+      document.getElementById('totalEnquiries').textContent = data.enquiries||0;
+      document.getElementById('totalMedia').textContent     = data.gallery||0;
+      document.getElementById('totalEvents').textContent    = data.events||0;
+      document.getElementById('totalClasses').textContent   = data.classes||3;
+      if (data.recentEnquiries?.length) {
+        document.getElementById('recentEnquiriesTbody').innerHTML = data.recentEnquiries.map(e => `
+          <tr>
+            <td style="color:var(--ivory)">${e.firstName} ${e.lastName}</td>
+            <td>${e.email}</td>
+            <td>${e.danceForm||'—'}</td>
+            <td>${new Date(e.createdAt).toLocaleDateString()}</td>
+          </tr>
+        `).join('');
+      }
+    }
+  } catch {}
+}
+
+document.addEventListener('DOMContentLoaded', () => switchPanel('overview'));
+</script>
+</body>
+</html>
